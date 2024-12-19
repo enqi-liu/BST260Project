@@ -1,0 +1,38 @@
+---
+title: Problem set 10
+date: 2024-12-16
+execute: 
+  eval: false
+---
+
+```{r}
+library(excessmort)
+puerto_rico_counts
+```
+
+
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+data("puerto_rico_counts") 
+head(puerto_rico_counts)
+
+population_summary <- puerto_rico_counts %>%
+  group_by(agegroup, sex) %>%
+  summarise(mean_population = mean(population, na.rm = TRUE))
+
+print(population_summary)
+
+ggplot(population_summary, aes(x = agegroup, y = mean_population, fill = sex)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Average Population Size by Age Group and Sex",
+       x = "Age Group", y = "Average Population Size") +
+  theme_minimal()
+```
+In the younger age group, under 14 years, male has higher proportion than female. This might be because of the notion that some of the family willingly prefer having boy baby than  girl. Besides, the sex ratio at born is around 105-107 boys versus 100 girls globally.
+
+In the working age group, 20-49, female has higher proportion than male. This might be because male moving out for work or moving out for immigration. 
+During the elder group, the proportion of female is still higher than that of male. This might be because the average age of female is higher than that of male. 
