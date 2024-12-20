@@ -18,7 +18,7 @@ Guidelines: Describe the dataset(s) you used, including information about data c
 Purpose: The results section presents the main findings of your analysis without interpretation. Organize the data logically to highlight key insights, using tables, figures, and charts to illustrate trends and comparisons.
 Guidelines: For each result, briefly describe it and refer to relevant visuals or tables where appropriate. Do not provide explanations or discuss implications in this section; focus only on presenting the findings clearly and accurately.
 
-## Prepare
+### Prepare
 ```{r warning = FALSE, message = FALSE}
 library(excessmort)
 library(dplyr)
@@ -27,7 +27,7 @@ library(ggplot2)
 data("puerto_rico_counts") 
 head(puerto_rico_counts)
 ```
-## Task 1
+### Task 1
 
 ```{r}
 population_summary <- puerto_rico_counts |>
@@ -48,29 +48,29 @@ In the working age group, 20-49, female has higher proportion than male. This mi
 During the elder group, the proportion of female is still higher than that of male. This might be because the average age of female is higher than that of male. 
 
 
-## Task 2
+### Task 2
 
 ```{r}
-pre_2017_data <- puerto_rico_counts %>%
-  filter(date < as.Date("2017-01-01")) %>%
+pre_2017_data <- puerto_rico_counts |>
+  filter(date < as.Date("2017-01-01")) |>
   mutate(
     year = year(date),
     week_of_year = epiweek(date)
   )
 
 # Aggregate by year, week_of_year, agegroup, and sex, and ensure full weeks (7 distinct days)
-weekly_data <- pre_2017_data %>%
-  group_by(year, week_of_year, agegroup, sex) %>%
+weekly_data <- pre_2017_data |>
+  group_by(year, week_of_year, agegroup, sex) |>
   summarise(
     weekly_outcome = sum(outcome, na.rm = TRUE),
     ndays = n_distinct(date),  # Count distinct days in this week-group
     .groups = 'drop'
-  ) %>%
+  ) |>
   filter(ndays == 7)  # Keep only full weeks
 
 # Compute baseline statistics across all pre-2017 years
-baseline_stats <- weekly_data %>%
-  group_by(agegroup, sex, week_of_year) %>%
+baseline_stats <- weekly_data |>
+  group_by(agegroup, sex, week_of_year) |>
   summarise(
     mean_outcome = mean(weekly_outcome, na.rm = TRUE),
     sd_outcome = sd(weekly_outcome, na.rm = TRUE),
@@ -98,6 +98,104 @@ The analysis shows clear mortality patterns by age and sex. Males generally exhi
 
 **Discussion**
 The results validate expected mortality patterns, with notable higher rates in males and older demographics. The weekly stability suggests minimal impact from short-term external factors during the analyzed period. Age group combinations were effective in reducing complexity without losing critical insights. This approach is beneficial for similar studies to simplify demographic analysis. 
+
+### Task 3
+
+```{r}
+# Filter for pre-2017 and 2017 data, assign year and week_of_year
+pre_and_during_2017 <- puerto_rico_counts |>
+  filter(date < as.Date("2018-01-01")) |>  # Include all data before 2018
+  mutate(
+    year = year(date),
+    week_of_year = epiweek(date)
+  ) |>
+  group_by(year, week_of_year) |>
+  summarise(
+    total_outcome = sum(outcome, na.rm = TRUE),  # Sum weekly outcomes
+    ndays = n_distinct(date),                   # Ensure full weeks (7 days)
+    .groups = "drop"
+  ) |>
+  filter(ndays == 7) |>  # Keep only full weeks
+  mutate(
+    week_start = as.Date(paste(year, week_of_year, 1, sep = "-"), "%Y-%U-%u")  # Start of each epiweek
+  )
+
+# Visualization: Weekly total mortality over time
+# Add a new date column to represent the start of each week
+pre_and_during_2017 <- pre_and_during_2017 |>
+  mutate(week_start = as.Date(paste(year, week_of_year, 1, sep = "-"), "%Y-%U-%u"))
+
+# Visualization: Weekly total mortality over time
+ggplot(pre_and_during_2017, aes(x = week_start, y = total_outcome)) +
+  geom_line() +
+  labs(
+    title = "Weekly Total Mortality (Pre-2017 and 2017)",
+    x = "Week Start Date",
+    y = "Total Weekly Mortality"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1), # Rotate x-axis labels for readability
+    panel.grid.minor = element_blank()
+  )
+```
+
+```{r}
+# Identify weeks with mortality >= 700 for year > 1987 and < 2017
+weeks_high_mortality_post_1987 <- pre_and_during_2017 |>
+  filter(year > 1987 & year <= 2017, total_outcome >= 700) |>
+  select(year, week_of_year, total_outcome, week_start)
+
+# Identify weeks with mortality > 550 for year <= 1987
+weeks_high_mortality_pre_1987 <- pre_and_during_2017 |>
+  filter(year <= 1987, total_outcome > 550) |>
+  select(year, week_of_year, total_outcome, week_start)
+
+# Combine high mortality weeks
+high_mortality_weeks <- bind_rows(
+  weeks_high_mortality_post_1987 |> select(year, week_of_year),
+  weeks_high_mortality_pre_1987 |> select(year, week_of_year)
+)
+
+high_mortality_weeks
+```
+
+```{r}
+#### Remove high mortality weeks from baseline computation
+# Filter pre-2017 data and define epiweek and year
+pre_2017_data <- puerto_rico_counts |>
+  filter(date < as.Date("2017-01-01")) |>
+  mutate(
+    year = year(date),
+    week_of_year = epiweek(date)
+  )
+
+# Aggregate by year, week_of_year, agegroup, and sex, and ensure full weeks (7 distinct days)
+weekly_data <- pre_2017_data |>
+  group_by(year, week_of_year, agegroup, sex) |>
+  summarise(
+    weekly_outcome = sum(outcome, na.rm = TRUE),
+    ndays = n_distinct(date),  # Count distinct days in this week-group
+    .groups = 'drop'
+  ) |>
+  filter(ndays == 7)  # Keep only full weeks
+
+# Remove weeks with high mortality
+filtered_weekly_data <- weekly_data |>
+  anti_join(high_mortality_weeks, by = c("year", "week_of_year"))
+
+# Compute baseline statistics across all pre-2017 years, excluding high mortality weeks
+baseline_stats <- filtered_weekly_data |>
+  group_by(agegroup, sex, week_of_year) |>
+  summarise(
+    mean_outcome = mean(weekly_outcome, na.rm = TRUE),
+    sd_outcome = sd(weekly_outcome, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+print("Baseline Weekly Statistics (Pre-2017, Excluding High Mortality Weeks):")
+print(baseline_stats)
+```
 
 
 # Discussion (600-700 words)
