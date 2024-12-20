@@ -127,3 +127,66 @@ ggplot(baseline_stats_combined, aes(x = week_of_year, y = mean_outcome, color = 
   theme_minimal()
 ```
 
+# Task 4
+
+```{r}
+maria <- make_date(2017, 9, 20)
+
+q4_data <- puerto_rico_counts |>
+  filter(between(year(date), 2017, 2018)) |>
+  mutate(date = floor_date(date, week_start = wday(maria)-1, unit = "week")) 
+
+weekly_counts <- q4_data |>
+  group_by(date, sex, agegroup) |>
+  summarize(outcome = sum(outcome,na.rm = TRUE), population = mean(population,na.rm = TRUE), n = n(),
+            .groups = "drop")|>
+  filter(n == 7) |>
+  select(-n)|>
+  mutate(week_of_year=epiweek(date))
+
+excess_counts <- weekly_counts %>%
+  left_join(baseline_stats, by = c('sex', 'agegroup','week_of_year'))|>
+  mutate(excess_deaths=outcome-mean_outcome)
+
+
+
+weekly_counts_summary = weekly_counts|>
+  group_by(date) |>
+  summarize(outcome = sum(outcome), 
+            population = sum(population),
+            .groups = "drop") 
+
+
+```
+
+
+
+```{r}
+library(ggplot2)
+
+# Create the plot with facet grid
+ggplot(excess_counts, aes(x = agegroup, y = excess_deaths)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  facet_grid(~sex) + # Create separate panels for male and female
+  labs(
+    title = "Excess Deaths by Age Group and Sex (2017–2018)",
+    x = "Age Group",
+    y = "Total Excess Deaths"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1) # Rotate x-axis labels for better readability
+  )
+
+```
+
+
+
+
+
+
+
+
+
+
+
