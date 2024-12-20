@@ -3,8 +3,11 @@ title: Excess mortality in Puerto Rico after Hurricane María.
 date: 2024-12-16
 ---
 # 1 Abstract (150-200 words)
-Purpose: The abstract provides a concise summary of your project, including its objectives, key findings, and significance. Write this section last, after completing all other sections, to accurately reflect your project’s focus and main results.
-Guidelines: Limit this section to 150-200 words. Briefly outline the purpose of your study, the approach you used, and the primary results and conclusions. The abstract should be clear, succinct, and give readers an immediate understanding of what your project entails.
+This project explores excess mortality in Puerto Rico after Hurricane María using historical mortality data to establish a strong baseline and assess the impact of the disaster. Historical mortality trends, 1990–2016, were analyzed in order to calculate expected weekly mortality rates by age group and sex, excluding weeks with anomalous spikes in order to ensure statistical reliability. Post-hurricane mortality data, 2017–2018, were then compared against these baselines in order to estimate excess deaths across demographic groups.
+
+Key findings showed a very large rise in mortality immediately after Hurricane María, with large differences between sexes and especially among the older population (85+). While females showed higher mortality in older groups, males showed larger increases across almost all age groups. Little excess mortality was seen in younger age groups, suggesting some resilience. Comparison with New York Times data confirmed the overall trends but showed discrepancies in November 2017, possibly due to delayed registrations of deaths.
+
+These findings highlight the important impact of Hurricane María on the mortality rates in Puerto Rico and emphasize the vulnerability of the elderly to systemic disturbances. The study provides pragmatic suggestions for disaster preparedness, emphasizing the need for focused public health efforts and fair distribution of resources to mitigate the effects of future disasters.
 
 # 2 Introduction (500-600 words)
 Purpose: The introduction sets the stage for your project, presenting the background and rationale for your analysis. Explain why the topic is significant.
