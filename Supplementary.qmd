@@ -1,0 +1,120 @@
+---
+title: Excess mortality in Puerto Rico after Hurricane María.
+date: 2024-12-16
+---
+
+## Prepare
+```{r warning = FALSE, message = FALSE}
+library(excessmort)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+data("puerto_rico_counts") 
+head(puerto_rico_counts)
+```
+
+
+## Task 2
+```{r}
+pre_2017_data <- puerto_rico_counts %>%
+  filter(date < as.Date("2017-01-01")) %>%
+  mutate(
+    year = year(date),
+    week_of_year = epiweek(date)
+  )
+
+# Aggregate by year, week_of_year, agegroup, and sex, and ensure full weeks (7 distinct days)
+weekly_data <- pre_2017_data %>%
+  group_by(year, week_of_year, agegroup, sex) %>%
+  summarise(
+    weekly_outcome = sum(outcome, na.rm = TRUE),
+    ndays = n_distinct(date),  # Count distinct days in this week-group
+    .groups = 'drop'
+  ) %>%
+  filter(ndays == 7)  # Keep only full weeks
+
+# Compute baseline statistics across all pre-2017 years
+baseline_stats <- weekly_data %>%
+  group_by(agegroup, sex, week_of_year) %>%
+  summarise(
+    mean_outcome = mean(weekly_outcome, na.rm = TRUE),
+    sd_outcome = sd(weekly_outcome, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+# Check if data is available
+if (nrow(baseline_stats) == 0) {
+  stop("No data available for baseline after filtering full weeks.")
+}
+
+print("Baseline Weekly Statistics (Pre-2017):")
+print(baseline_stats)
+```
+
+```{r}
+pre_2017_data <- puerto_rico_counts %>%
+  filter(date < as.Date("2017-01-01")) %>%
+  mutate(
+    year = year(date),
+    week_of_year = epiweek(date)
+  )
+
+## Combine data into bigger age groups
+# - Combine (0-4, 5-9, 10-14) into "0-14"
+# - Combine (15-19,20-24,25-29,30-34,35-39) into "15-39"
+# - Combine (40-44,45-49,50-54,55-59) into "40-59"
+# - Combine (60-64,65-69,70-74) into "60-74"
+# - Combine (75-79,80-84,85-Inf) into "75+"
+combined_data <- pre_2017_data %>%
+  mutate(combined_agegroup = case_when(
+    agegroup %in% c("0-4", "5-9", "10-14") ~ "0-14",
+    agegroup %in% c("15-19", "20-24", "25-29", "30-34", "35-39") ~ "15-39",
+    agegroup %in% c("40-44", "45-49", "50-54", "55-59") ~ "40-59",
+    agegroup %in% c("60-64", "65-69", "70-74") ~ "60-74",
+    agegroup %in% c("75-79", "80-84", "85-Inf") ~ "75+",
+    TRUE ~ agegroup
+  ))
+
+# Aggregate by year, week_of_year, combined_agegroup, and sex, ensuring full weeks (7 distinct days)
+weekly_data_combined <- combined_data %>%
+  group_by(year, week_of_year, combined_agegroup, sex) %>%
+  summarise(
+    weekly_outcome = sum(outcome, na.rm = TRUE),
+    ndays = n_distinct(date),
+    .groups = 'drop'
+  ) %>%
+  filter(ndays == 7)
+
+# Compute baseline statistics across all pre-2017 years
+baseline_stats_combined <- weekly_data_combined %>%
+  group_by(combined_agegroup, sex, week_of_year) %>%
+  summarise(
+    mean_outcome = mean(weekly_outcome, na.rm = TRUE),
+    sd_outcome = sd(weekly_outcome, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+# Check if data is available
+if (nrow(baseline_stats_combined) == 0) {
+  stop("No data available for baseline after filtering full weeks.")
+}
+
+print("Baseline Weekly Statistics With Combined Age Groups:")
+print(baseline_stats_combined)
+
+# Plot the combined groups
+ggplot(baseline_stats_combined, aes(x = week_of_year, y = mean_outcome, color = sex)) +
+  geom_line() +
+  facet_wrap(~ combined_agegroup, scales = "free_y") +
+  labs(
+    title = "Weekly Expected Mortality (Pre-2017) by Combined Age Groups and Sex",
+    x = "Week of Year",
+    y = "Mean Weekly Mortality",
+    color = "Sex"
+  ) +
+  theme_minimal()
+```
+
+
+
+

@@ -25,10 +25,8 @@ library(dplyr)
 library(lubridate)
 library(ggplot2)
 data("puerto_rico_counts") 
-#head(puerto_rico_counts)
+head(puerto_rico_counts)
 ```
-
-
 ## Task 1
 
 ```{r}
@@ -53,89 +51,41 @@ During the elder group, the proportion of female is still higher than that of ma
 ## Task 2
 
 ```{r}
-### Estimate expected mortality and a standard deviation for each week
-pre_2017_data <- puerto_rico_counts |>
-  filter(date < as.Date("2017-01-01")) |>
+pre_2017_data <- puerto_rico_counts %>%
+  filter(date < as.Date("2017-01-01")) %>%
   mutate(
     year = year(date),
-    week_of_year = week(date) # or week(date), but isoweek aligns ISO weeks
+    week_of_year = epiweek(date)
   )
 
-# Compute weekly mortality per agegroup, sex, and week_of_year, aggregated by year
-# sum over all days within each week_of_year-year combination
-weekly_data <- pre_2017_data |>
-  group_by(year, week_of_year, agegroup, sex) |>
-  summarise(weekly_outcome = sum(outcome), .groups = 'drop')
+# Aggregate by year, week_of_year, agegroup, and sex, and ensure full weeks (7 distinct days)
+weekly_data <- pre_2017_data %>%
+  group_by(year, week_of_year, agegroup, sex) %>%
+  summarise(
+    weekly_outcome = sum(outcome, na.rm = TRUE),
+    ndays = n_distinct(date),  # Count distinct days in this week-group
+    .groups = 'drop'
+  ) %>%
+  filter(ndays == 7)  # Keep only full weeks
 
-# calculate the mean and SD of mortality per week_of_year, agegroup, and sex, 
-# using all pre-2017 years as a baseline.
-baseline_stats <- weekly_data |>
-  group_by(agegroup, sex, week_of_year) |>
+# Compute baseline statistics across all pre-2017 years
+baseline_stats <- weekly_data %>%
+  group_by(agegroup, sex, week_of_year) %>%
   summarise(
     mean_outcome = mean(weekly_outcome, na.rm = TRUE),
     sd_outcome = sd(weekly_outcome, na.rm = TRUE),
     .groups = 'drop'
   )
 
-print("Baseline Weekly Statistics (Pre-2017):")
-print(baseline_stats)
-
-# Plotting a few selected age groups to show variation
+# Plot: Facet by age group, color by sex on the same plot
 ggplot(baseline_stats, aes(x = week_of_year, y = mean_outcome, color = sex)) +
   geom_line() +
   facet_wrap(~ agegroup, scales = "free_y") +
   labs(
     title = "Weekly Expected Mortality (Pre-2017) by Age Group and Sex",
     x = "Week of Year",
-    y = "Mean Weekly Mortality"
-  ) +
-  theme_minimal()
-```
-
-
-```{r}
-##### Maybe in supplementary?
-## Combine data into bigger age groups
-# - Combine (0-4, 5-9, 10-14) into "0-14"
-# - Combine (15-19,20-24,25-29,30-34,35-39) into "15-39"
-# - Combine (40-44,45-49,50-54,55-59) into "40-59"
-# - Combine (60-64,65-69,70-74) into "60-74"
-# - Combine (75-79,80-84,85-Inf) into "75+"
-combined_data <- pre_2017_data |>
-  mutate(combined_agegroup = case_when(
-    agegroup %in% c("0-4", "5-9", "10-14") ~ "0-14",
-    agegroup %in% c("15-19", "20-24", "25-29", "30-34", "35-39") ~ "15-39",
-    agegroup %in% c("40-44", "45-49", "50-54", "55-59") ~ "40-59",
-    agegroup %in% c("60-64", "65-69", "70-74") ~ "60-74",
-    agegroup %in% c("75-79", "80-84", "85-Inf") ~ "75+",
-    TRUE ~ agegroup # If any leftover group, keep as is
-  ))
-
-# Aggregate daily data to weekly mortality by combined_agegroup, sex, year, and week_of_year
-weekly_data_combined <- combined_data |>
-  group_by(year, week_of_year, combined_agegroup, sex) |>
-  summarise(weekly_outcome = sum(outcome), .groups = 'drop')
-
-# Compute baseline means and sds per week_of_year, agegroup, sex
-baseline_stats_combined <- weekly_data_combined |>
-  group_by(combined_agegroup, sex, week_of_year) |>
-  summarise(
-    mean_outcome = mean(weekly_outcome, na.rm = TRUE),
-    sd_outcome = sd(weekly_outcome, na.rm = TRUE),
-    .groups = 'drop'
-  )
-
-#print("Baseline Weekly Statistics With Combined Age Groups:")
-#print(baseline_stats_combined)
-
-# Plot the combined groups
-ggplot(baseline_stats_combined, aes(x = week_of_year, y = mean_outcome, color = sex)) +
-  geom_line() +
-  facet_wrap(~ combined_agegroup, scales = "fixed") +
-  labs(
-    title = "Weekly Expected Mortality (Pre-2017) by Combined Age Groups and Sex",
-    x = "Week of Year",
-    y = "Mean Weekly Mortality"
+    y = "Mean Weekly Mortality",
+    color = "Sex"
   ) +
   theme_minimal()
 ```
