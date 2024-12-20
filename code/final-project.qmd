@@ -1,7 +1,6 @@
 ---
 title: Excess mortality in Puerto Rico after Hurricane María.
 date: 2024-12-16
-format: pdf
 ---
 # 1 Abstract (150-200 words)
 Purpose: The abstract provides a concise summary of your project, including its objectives, key findings, and significance. Write this section last, after completing all other sections, to accurately reflect your project’s focus and main results.
@@ -15,12 +14,13 @@ Guidelines: Start with a broad overview of the topic, gradually narrowing down t
 
 **Task 1**
 
-**Task 2**
+**Task2:**
 
 We used historical mortality data from Puerto Rico collected before 2017 to estimate weekly expected mortality and standard deviation by age group and sex. The dataset included daily mortality counts, which we filtered for pre-2017 dates. Using the R package, we added variables for the year and ISO week to ensure standard week alignment. We calculated weekly mortality by aggregating daily counts per age group, sex, and week. Baseline statistics, including mean and standard deviation, were computed for each group. For streamlined analysis, age groups were combined based on mortality rate similarities into categories: 0-14, 15-39, 40-59, 60-74, and 75+. Visualization of these patterns was achieved using ggplot2, showing trends in mean weekly mortality by age and sex.
 
-**Task 3**
+**Task3:**
 
+To explore excess mortality periods in Puerto Rico before 2018 (during or before 2017), we analyzed weekly mortality counts, ensuring inclusion of only complete weeks (seven days). We visualized the data to identify spikes, using thresholds to define excess mortality—700 deaths per week post-1987 and 550 pre-1987—based on historical trends. This baseline allowed us to flag weeks with significantly higher mortality. We then removed these high mortality weeks from the dataset to recalculate expected death rates. This ensured that baseline statistics, such as mean and standard deviation, accurately reflected normal patterns without influence from exceptional events. 
 
 **Task 4**
 
@@ -34,8 +34,6 @@ The Puerto Rico dataset in excessmort package was grouped by date, and the two d
 
 
 # 4 Results (500-600 words)
-Purpose: The results section presents the main findings of your analysis without interpretation. Organize the data logically to highlight key insights, using tables, figures, and charts to illustrate trends and comparisons.
-Guidelines: For each result, briefly describe it and refer to relevant visuals or tables where appropriate. Do not provide explanations or discuss implications in this section; focus only on presenting the findings clearly and accurately.
 
 ### Prepare
 ```{r warning = FALSE, message = FALSE}
@@ -47,6 +45,7 @@ library(readxl)
 data("puerto_rico_counts") 
 head(puerto_rico_counts)
 ```
+
 ### Task 1
 
 ```{r}
@@ -70,7 +69,7 @@ During the elder group, the proportion of female is still higher than that of ma
 
 ### Task 2
 
-```{r}
+```{r fig.width=12, fig.height=8}
 pre_2017_data <- puerto_rico_counts |>
   filter(date < as.Date("2017-01-01")) |>
   mutate(
@@ -140,18 +139,23 @@ pre_and_during_2017 <- puerto_rico_counts |>
 pre_and_during_2017 <- pre_and_during_2017 |>
   mutate(week_start = as.Date(paste(year, week_of_year, 1, sep = "-"), "%Y-%U-%u"))
 
-# Visualization: Weekly total mortality over time
 ggplot(pre_and_during_2017, aes(x = week_start, y = total_outcome)) +
-  geom_line() +
+  geom_line(color = "#2C3E50", size = 1) +  
+  geom_smooth(se = FALSE, color = "#E74C3C", linetype = "dashed", size = 0.8) +  
   labs(
     title = "Weekly Total Mortality (Pre-2017 and 2017)",
     x = "Week Start Date",
     y = "Total Weekly Mortality"
   ) +
-  theme_minimal() +
+  scale_x_date(date_labels = "%Y", date_breaks = "12 months") +  
+  theme_minimal(base_size = 15) +  
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1), # Rotate x-axis labels for readability
-    panel.grid.minor = element_blank()
+    plot.title = element_text(hjust = 0.5),  
+    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1), 
+    axis.title.y = element_text(margin = margin(r = 10)), 
+    panel.grid.minor = element_blank(),  
+    panel.background = element_rect(fill = "#ECF0F1") 
   )
 ```
 
@@ -172,10 +176,6 @@ high_mortality_weeks <- bind_rows(
   weeks_high_mortality_pre_1987 |> select(year, week_of_year)
 )
 
-high_mortality_weeks
-```
-
-```{r}
 #### Remove high mortality weeks from baseline computation
 # Filter pre-2017 data and define epiweek and year
 pre_2017_data <- puerto_rico_counts |>
@@ -207,12 +207,9 @@ baseline_stats <- filtered_weekly_data |>
     sd_outcome = sd(weekly_outcome, na.rm = TRUE),
     .groups = 'drop'
   )
-
-print("Baseline Weekly Statistics (Pre-2017, Excluding High Mortality Weeks):")
-print(baseline_stats)
 ```
 
-
+The weekly total mortality plot reveals several periods with significant spikes in mortality between the years 1985 and 2017. As you can see from the graph, it shows fluctuations with some significant spikes, particularly around the mid-1990s, late 1990s, early 2000s, and 2017. The identified weeks exhibiting high mortality include weeks 2 and 3 of 1995, week 38 of 1998, week 1 of 2005, weeks 39 and 40 of 2017, and week 41 of 1985. After identifying and isolating these high mortality weeks, we excluded them from the dataset and recomputed expected death rates. The refined data is documented in the Supplementary Methods, supporting a more accurate understanding of mortality trends absent of those identified anomalies.
 
 ### Task 4
 
@@ -310,7 +307,11 @@ The NY Times data exhibits a sharp drop toward the end of 2017. The absolute dif
 
 **Task 2**
 
-The results validate expected mortality patterns, with notable higher rates in males and older demographics. The weekly stability suggests minimal impact from short-term external factors during the analyzed period. Age group combinations were effective in reducing complexity without losing critical insights. This approach is beneficial for similar studies to simplify demographic analysis. 
+The graph reveals several critical trends. Mortality rates increase with age, which aligns with demographic expectations, and males consistently show higher mortality compared to females across all age groups. This could be due to factors like lifestyle differences or biological vulnerabilities. Stability throughout most weeks suggests regular seasonal patterns; however, there are fluctuations, particularly in older age groups. For example, the "85 and over" group exhibits peaks that might be linked to seasonal illnesses or external events like extreme weather. Such patterns highlight the need for public health initiatives targeting these vulnerabilities, such as vaccination campaigns during flu season or alerts during heatwaves. Understanding these trends is crucial for resource allocation and effective intervention strategies, ensuring high-risk populations receive appropriate attention and care. Analyzing post-2017 data could further illuminate the impact of recent healthcare improvements or policy changes.
+
+**Task 3**
+
+The analysis of weekly mortality data reveals periods of potential excess mortality, notably a significant spike in late 2017, likely linked to Hurricane Maria. This spike indicates deviations from expected mortality rates due to external factors. To accurately assess expected death rates, it's crucial to exclude such outlier periods. By removing weeks affected by the hurricane, a baseline can be recomputed using data from regular conditions, ensuring more reliable mortality predictions. This refined baseline helps in understanding post-2017 mortality trends and supports more precise public health planning and intervention strategies.
 
 **Task 4**
 
