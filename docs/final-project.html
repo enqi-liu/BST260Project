@@ -58,16 +58,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="final project 1-enqi_files/libs/clipboard/clipboard.min.js"></script>
-<script src="final project 1-enqi_files/libs/quarto-html/quarto.js"></script>
-<script src="final project 1-enqi_files/libs/quarto-html/popper.min.js"></script>
-<script src="final project 1-enqi_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="final project 1-enqi_files/libs/quarto-html/anchor.min.js"></script>
-<link href="final project 1-enqi_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="final project 1-enqi_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="final project 1-enqi_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="final project 1-enqi_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="final project 1-enqi_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="final-project_files/libs/clipboard/clipboard.min.js"></script>
+<script src="final-project_files/libs/quarto-html/quarto.js"></script>
+<script src="final-project_files/libs/quarto-html/popper.min.js"></script>
+<script src="final-project_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="final-project_files/libs/quarto-html/anchor.min.js"></script>
+<link href="final-project_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="final-project_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="final-project_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="final-project_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="final-project_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -113,7 +113,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="methods-600-700-words" class="level1">
 <h1>3 Methods (600-700 words)</h1>
-<p>Purpose: This section details the data sources, methods, and analytical techniques you used to conduct your analysis. It should be specific enough that someone else could replicate your study using the same resources and approach. Guidelines: Describe the dataset(s) you used, including information about data collection (e.g., sources, time frame). Outline your approach for cleaning and analyzing the data, including any statistical or computational methods applied. Clearly explain any assumptions or limitations in your approach.</p>
+<p><strong>Task 1</strong></p>
+<p><strong>Task 2</strong></p>
+<p>We used historical mortality data from Puerto Rico collected before 2017 to estimate weekly expected mortality and standard deviation by age group and sex. The dataset included daily mortality counts, which we filtered for pre-2017 dates. Using the R package, we added variables for the year and ISO week to ensure standard week alignment. We calculated weekly mortality by aggregating daily counts per age group, sex, and week. Baseline statistics, including mean and standard deviation, were computed for each group. For streamlined analysis, age groups were combined based on mortality rate similarities into categories: 0-14, 15-39, 40-59, 60-74, and 75+. Visualization of these patterns was achieved using ggplot2, showing trends in mean weekly mortality by age and sex.</p>
+<p><strong>Task 3</strong></p>
+<p><strong>Task 4</strong></p>
+<p>For task 4, we used the puerto_rico_counts dataset from 2017 to 2018. Weekly outcomes were derived using floor_date() by aggregating the raw daily mortality data to weekly totals, aligning weeks to the day of Hurricane María. Only complete weekly records (7 days) were retained to ensure data consistency and completeness. We also use epiweek() to match weeks of different years. Weekly mortality counts were grouped by date, sex, and agegroup. Historical mortality from pre-2017 data are used to calculate expected mortality (mean_outcome) for each epiweek, age group, and sex. Then, weekly excess deaths from 2017-2018 were calculated by subtracting the expected deaths from the observed weekly deaths for each sex and age group by matching epiweek.</p>
+<p><strong>Task 5</strong></p>
+<p>The New York Times data was extracted via pdfplumber in Python (ipynb file is provided in directory ‘code’). After saving it as an Excel file, we loaded it using the read_excel function in R. The Puerto Rico daily mortality data was filtered to include dates between January 1, 2015, and November 30, 2017, as December was not predicted yet at that point.</p>
+<p>The Puerto Rico dataset in excessmort package was grouped by date, and the two datasets were merged using a left join on the Date column. Absolute values of difference between Outcome_NYTimes (from the NY Times dataset) and Outcome_DailyData (from the Puerto Rico dataset) were also calculated and plotted.</p>
 </section>
 <section id="results-500-600-words" class="level1">
 <h1>4 Results (500-600 words)</h1>
@@ -125,8 +133,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"puerto_rico_counts"</span>) </span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(puerto_rico_counts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"puerto_rico_counts"</span>) </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(puerto_rico_counts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  agegroup       date    sex population outcome
 1      0-4 1985-01-01 female   158843.0       2
@@ -174,7 +183,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="final-project-1-enqi_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="final-project_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -225,14 +234,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="final-project-1-enqi_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="final-project_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p><strong>Methods</strong> We used historical mortality data from Puerto Rico collected before 2017 to estimate weekly expected mortality and standard deviation by age group and sex. The dataset included daily mortality counts, which we filtered for pre-2017 dates. Using the R package, we added variables for the year and ISO week to ensure standard week alignment. We calculated weekly mortality by aggregating daily counts per age group, sex, and week. Baseline statistics, including mean and standard deviation, were computed for each group. For streamlined analysis, age groups were combined based on mortality rate similarities into categories: 0-14, 15-39, 40-59, 60-74, and 75+. Visualization of these patterns was achieved using ggplot2, showing trends in mean weekly mortality by age and sex.</p>
-<p><strong>Results</strong> The analysis shows clear mortality patterns by age and sex. Males generally exhibited higher mortality rates than females across most age groups. Mortality rates increased with age, particularly in the 75+ category. Over the weeks, mortality rates remained relatively stable, with minor fluctuations in younger groups. Combining age groups allowed us to maintain trend visibility while simplifying analysis. The visualizations highlighted these trends effectively, showing greater variability in older age groups. These patterns reflect demographic expectations, confirming the consistency and reliability of the estimated mortality statistics.</p>
-<p><strong>Discussion</strong> The results validate expected mortality patterns, with notable higher rates in males and older demographics. The weekly stability suggests minimal impact from short-term external factors during the analyzed period. Age group combinations were effective in reducing complexity without losing critical insights. This approach is beneficial for similar studies to simplify demographic analysis.</p>
+<p>The analysis shows clear mortality patterns by age and sex. Males generally exhibited higher mortality rates than females across most age groups. Mortality rates increased with age, particularly in the 75+ category. Over the weeks, mortality rates remained relatively stable, with minor fluctuations in younger groups. Combining age groups allowed us to maintain trend visibility while simplifying analysis. The visualizations highlighted these trends effectively, showing greater variability in older age groups. These patterns reflect demographic expectations, confirming the consistency and reliability of the estimated mortality statistics.</p>
 </section>
 <section id="task-3" class="level3">
 <h3 class="anchored" data-anchor-id="task-3">Task 3</h3>
@@ -276,7 +283,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="final-project-1-enqi_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="final-project_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -368,10 +375,116 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
+<section id="task-4" class="level3">
+<h3 class="anchored" data-anchor-id="task-4">Task 4</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>maria <span class="ot">&lt;-</span> <span class="fu">make_date</span>(<span class="dv">2017</span>, <span class="dv">9</span>, <span class="dv">20</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>q4_data <span class="ot">&lt;-</span> puerto_rico_counts <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">between</span>(<span class="fu">year</span>(date), <span class="dv">2017</span>, <span class="dv">2018</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">floor_date</span>(date, <span class="at">week_start =</span> <span class="fu">wday</span>(maria)<span class="sc">-</span><span class="dv">1</span>, <span class="at">unit =</span> <span class="st">"week"</span>)) </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>weekly_counts <span class="ot">&lt;-</span> q4_data <span class="sc">|&gt;</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(date, sex, agegroup) <span class="sc">|&gt;</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">outcome =</span> <span class="fu">sum</span>(outcome,<span class="at">na.rm =</span> <span class="cn">TRUE</span>),<span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>)<span class="sc">|&gt;</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">==</span> <span class="dv">7</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n)<span class="sc">|&gt;</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week_of_year=</span><span class="fu">epiweek</span>(date))</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>excess_counts <span class="ot">&lt;-</span> weekly_counts <span class="sc">%&gt;%</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(baseline_stats, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'sex'</span>, <span class="st">'agegroup'</span>,<span class="st">'week_of_year'</span>))<span class="sc">|&gt;</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">excess_deaths=</span>outcome<span class="sc">-</span>mean_outcome)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the combined groups</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(excess_counts, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> excess_deaths, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> agegroup, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Weekly Excess Mortality  by Combined Age Groups and Sex"</span>,</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Week of Year"</span>,</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Weekly Excess Mortality"</span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">70</span>, <span class="at">hjust =</span> <span class="dv">1</span>),  <span class="co"># Rotate week labels for better readability</span></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">face =</span> <span class="st">"bold"</span>) <span class="co"># Adjust facet label                        </span></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>  ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final-project_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Weekly excess deaths were plotted for each age group, separated by sex using facet grids. Axes were scaled independently (free_y) to accommodate varying ranges of mortality across age groups. Weekly excess deaths varied significantly by age group and sex. Older age groups (e.g., 85+) exhibited the highest excess mortality (roughly range from -10 to 85), particularly among females. Younger age groups (e.g., 0–4) showed minimal to no significant excess deaths. Generally, across most age groups, females experienced slightly higher excess deaths than males, particularly in the elderly cohorts, while mortality in male is more fluctuated than mortality in female. Excess mortality peaked in the weeks immediately following Hurricane María(2017/09/20), with continued elevated mortality into early 2018. Mortality trends normalized for most age groups by mid-2018.</p>
+</section>
+<section id="task-5" class="level3">
+<h3 class="anchored" data-anchor-id="task-5">Task 5</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read and prepare NYTimes data</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>ny_times <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"../data/ny_times_data.xlsx"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Date) <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as.Date</span>(Date))  <span class="co"># Ensure Date column is in Date format</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare Puerto Rico daily data</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>daily_data <span class="ot">&lt;-</span> puerto_rico_counts <span class="sc">%&gt;%</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">&gt;=</span> <span class="fu">as.Date</span>(<span class="st">"2015-01-01"</span>) <span class="sc">&amp;</span> date <span class="sc">&lt;=</span> <span class="fu">as.Date</span>(<span class="st">"2017-11-30"</span>)) <span class="sc">%&gt;%</span>  <span class="co"># Filter date range</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(date) <span class="sc">%&gt;%</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">Outcome =</span> <span class="fu">sum</span>(outcome, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Date =</span> date) <span class="sc">%&gt;%</span>  <span class="co"># Rename `date` to `Date` for consistency</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Date)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Join datasets and calculate the difference</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>compared_data <span class="ot">&lt;-</span> ny_times <span class="sc">%&gt;%</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(daily_data, <span class="at">by =</span> <span class="st">"Date"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Outcome_NYTimes =</span> Outcome.x, <span class="at">Outcome_DailyData =</span> Outcome.y) <span class="sc">%&gt;%</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Difference =</span> Outcome_NYTimes <span class="sc">-</span> Outcome_DailyData)  <span class="co"># Add Difference column</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the data</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(compared_data, <span class="fu">aes</span>(<span class="at">x =</span> Date)) <span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> Outcome_NYTimes, <span class="at">color =</span> <span class="st">"NYTimes"</span>), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> Outcome_DailyData, <span class="at">color =</span> <span class="st">"DailyData"</span>), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Comparison of NYTimes and Daily Data Outcomes"</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Mortality"</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Dataset"</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="st">"2 months"</span>,             <span class="co"># Add breaks every 2 months</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">date_labels =</span> <span class="st">"%Y-%m-%d"</span>,        <span class="co"># Format labels as "Year-Month-Day"</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)                 <span class="co"># Remove extra space on the x-axis</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),  <span class="co"># Rotate x-axis labels for readability</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>                          <span class="co"># Move legend to the bottom</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final-project_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot shows the trends of daily mortality counts from both the New York Times and the Puerto Rico daily dataset. Overall, the two datasets align closely for most of the time period (2015–2017), but notable divergences occur: The NY Times data exhibits a sharp drop toward the end of 2017. The absolute difference plot in Task 5 section of supplementary.qmd highlights the absolute differences in mortality counts between the two datasets. Significant spikes in differences are observed around November 2017, and noticeable spikes occur in August 2015 and 2016.</p>
+</section>
 </section>
 <section id="discussion-600-700-words" class="level1">
 <h1>Discussion (600-700 words)</h1>
-<p>Purpose: In the discussion, interpret the significance of your findings, explore potential implications, and relate the results back to your initial research questions or hypotheses. This section allows you to discuss any patterns, unexpected findings, or limitations and suggest possible future research. Guidelines: Analyze your results in the context of your research question, linking them back to the background information from the introduction. Consider what your findings reveal, any limitations they may have, and how they might impact future work or policy. End with a brief conclusion summarizing your main insights.</p>
+<p><strong>Task 2</strong></p>
+<p>The results validate expected mortality patterns, with notable higher rates in males and older demographics. The weekly stability suggests minimal impact from short-term external factors during the analyzed period. Age group combinations were effective in reducing complexity without losing critical insights. This approach is beneficial for similar studies to simplify demographic analysis.</p>
+<p><strong>Task 4</strong></p>
+<p>The analysis highlights a stark increase in excess deaths across most age groups immediately following Hurricane María, showing Hurricane María caused substantial disruption in Puerto Rico. The prolonged excess mortality among the 85+ group suggests vulnerabilities in healthcare access and other services for the elderly. The observed higher mortality in females for older cohorts may reflect sex-based differences in pre-existing health conditions or access to healthcare services post-hurricane, and minimal excess mortality in younger age groups (e.g., 0–4, 5–9) underscores their resilience of body recovery. It is suggested that policymakers should prioritize infrastructure resilience for the elderly during natural disasters.</p>
+<p><strong>Task 5</strong></p>
+<p>The analysis reveals strong alignment between the New York Times dataset and the Puerto Rico daily mortality data for most of the study period. However, a big discrepancy is observed in November 2017, which may be because death certificates for deaths occurring in November 2017 have been delayed and registered after December 6, 2017, which means they would not be included in the New York Times dataset.The differences in August 2015 and 2016 may be because a specific event (e.g., localized heatwaves) occurred at that point and only one dataset captured it promptly and accurately. These differences underscore the importance of validating data sources and methods when using mortality data for research or decision-making.</p>
 </section>
 
 </main>

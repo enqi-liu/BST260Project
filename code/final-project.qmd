@@ -1,20 +1,53 @@
 ---
-title: Project
+title: Excess mortality in Puerto Rico after Hurricane María.
 date: 2024-12-16
+format: pdf
 ---
+# 1 Abstract (150-200 words)
+Purpose: The abstract provides a concise summary of your project, including its objectives, key findings, and significance. Write this section last, after completing all other sections, to accurately reflect your project’s focus and main results.
+Guidelines: Limit this section to 150-200 words. Briefly outline the purpose of your study, the approach you used, and the primary results and conclusions. The abstract should be clear, succinct, and give readers an immediate understanding of what your project entails.
+
+# 2 Introduction (500-600 words)
+Purpose: The introduction sets the stage for your project, presenting the background and rationale for your analysis. Explain why the topic is significant.
+Guidelines: Start with a broad overview of the topic, gradually narrowing down to your specific focus. Conclude with a clear statement of your research questions, hypotheses, or objectives. Use 2-3 paragraphs to establish a solid foundation for the rest of the paper.
+
+# 3 Methods (600-700 words)
+
+**Task 1**
+
+**Task 2**
+
+We used historical mortality data from Puerto Rico collected before 2017 to estimate weekly expected mortality and standard deviation by age group and sex. The dataset included daily mortality counts, which we filtered for pre-2017 dates. Using the R package, we added variables for the year and ISO week to ensure standard week alignment. We calculated weekly mortality by aggregating daily counts per age group, sex, and week. Baseline statistics, including mean and standard deviation, were computed for each group. For streamlined analysis, age groups were combined based on mortality rate similarities into categories: 0-14, 15-39, 40-59, 60-74, and 75+. Visualization of these patterns was achieved using ggplot2, showing trends in mean weekly mortality by age and sex.
+
+**Task 3**
 
 
-# Prepare
-```{r warning = FALSE}
+**Task 4**
+
+For task 4, we used the puerto_rico_counts dataset from 2017 to 2018. Weekly outcomes were derived using floor_date() by aggregating the raw daily mortality data to weekly totals, aligning weeks to the day of Hurricane María. Only complete weekly records (7 days) were retained to ensure data consistency and completeness. We also use epiweek() to match weeks of different years. Weekly mortality counts were grouped by date, sex, and agegroup. Historical mortality from pre-2017 data are used to calculate expected mortality (mean_outcome) for each epiweek, age group, and sex. Then, weekly excess deaths from 2017-2018 were calculated by subtracting the expected deaths from the observed weekly deaths for each sex and age group by matching epiweek. 
+
+**Task 5**
+
+The New York Times data was extracted via pdfplumber in Python (ipynb file is provided in directory 'code'). After saving it as an Excel file, we loaded it using the read_excel function in R. The Puerto Rico daily mortality data was filtered to include dates between January 1, 2015, and November 30, 2017, as December was not predicted yet at that point. 
+
+The Puerto Rico dataset in excessmort package was grouped by date, and the two datasets were merged using a left join on the Date column.  Absolute values of difference between Outcome_NYTimes (from the NY Times dataset) and Outcome_DailyData (from the Puerto Rico dataset) were also calculated and plotted.
+
+
+# 4 Results (500-600 words)
+Purpose: The results section presents the main findings of your analysis without interpretation. Organize the data logically to highlight key insights, using tables, figures, and charts to illustrate trends and comparisons.
+Guidelines: For each result, briefly describe it and refer to relevant visuals or tables where appropriate. Do not provide explanations or discuss implications in this section; focus only on presenting the findings clearly and accurately.
+
+### Prepare
+```{r warning = FALSE, message = FALSE}
 library(excessmort)
 library(dplyr)
 library(lubridate)
 library(ggplot2)
+library(readxl)
+data("puerto_rico_counts") 
 head(puerto_rico_counts)
 ```
-
-
-# Task 1
+### Task 1
 
 ```{r}
 population_summary <- puerto_rico_counts |>
@@ -35,28 +68,27 @@ In the working age group, 20-49, female has higher proportion than male. This mi
 During the elder group, the proportion of female is still higher than that of male. This might be because the average age of female is higher than that of male. 
 
 
-
-
-# Task 2
-
-## Estimate expected mortality and a standard deviation for each week
+### Task 2
 
 ```{r}
 pre_2017_data <- puerto_rico_counts |>
   filter(date < as.Date("2017-01-01")) |>
   mutate(
     year = year(date),
-    week_of_year = isoweek(date) # or week(date), but isoweek aligns ISO weeks
+    week_of_year = epiweek(date)
   )
 
-# Compute weekly mortality per agegroup, sex, and week_of_year, aggregated by year
-# sum over all days within each week_of_year-year combination
+# Aggregate by year, week_of_year, agegroup, and sex, and ensure full weeks (7 distinct days)
 weekly_data <- pre_2017_data |>
   group_by(year, week_of_year, agegroup, sex) |>
-  summarise(weekly_outcome = sum(outcome), .groups = 'drop')
+  summarise(
+    weekly_outcome = sum(outcome, na.rm = TRUE),
+    ndays = n_distinct(date),  # Count distinct days in this week-group
+    .groups = 'drop'
+  ) |>
+  filter(ndays == 7)  # Keep only full weeks
 
-# calculate the mean and SD of mortality per week_of_year, agegroup, and sex, 
-# using all pre-2017 years as a baseline.
+# Compute baseline statistics across all pre-2017 years
 baseline_stats <- weekly_data |>
   group_by(agegroup, sex, week_of_year) |>
   summarise(
@@ -65,71 +97,126 @@ baseline_stats <- weekly_data |>
     .groups = 'drop'
   )
 
-print("Baseline Weekly Statistics (Pre-2017):")
-print(baseline_stats)
-
-# Plotting a few selected age groups to show variation
+# Plot: Facet by age group, color by sex on the same plot
 ggplot(baseline_stats, aes(x = week_of_year, y = mean_outcome, color = sex)) +
   geom_line() +
   facet_wrap(~ agegroup, scales = "free_y") +
   labs(
     title = "Weekly Expected Mortality (Pre-2017) by Age Group and Sex",
     x = "Week of Year",
-    y = "Mean Weekly Mortality"
+    y = "Mean Weekly Mortality",
+    color = "Sex"
   ) +
   theme_minimal()
 ```
 
-## Combine data into bigger age groups
+The analysis shows clear mortality patterns by age and sex. Males generally exhibited higher mortality rates than females across most age groups. Mortality rates increased with age, particularly in the 75+ category. Over the weeks, mortality rates remained relatively stable, with minor fluctuations in younger groups. Combining age groups allowed us to maintain trend visibility while simplifying analysis. The visualizations highlighted these trends effectively, showing greater variability in older age groups. These patterns reflect demographic expectations, confirming the consistency and reliability of the estimated mortality statistics.
+
+
+
+### Task 3
+
 ```{r}
-# combining age groups:
-# - Combine (0-4, 5-9, 10-14) into "0-14"
-# - Combine (15-19,20-24,25-29,30-34,35-39) into "15-39"
-# - Combine (40-44,45-49,50-54,55-59) into "40-59"
-# - Combine (60-64,65-69,70-74) into "60-74"
-# - Combine (75-79,80-84,85-Inf) into "75+"
-combined_data <- pre_2017_data |>
-  mutate(combined_agegroup = case_when(
-    agegroup %in% c("0-4", "5-9", "10-14") ~ "0-14",
-    agegroup %in% c("15-19", "20-24", "25-29", "30-34", "35-39") ~ "15-39",
-    agegroup %in% c("40-44", "45-49", "50-54", "55-59") ~ "40-59",
-    agegroup %in% c("60-64", "65-69", "70-74") ~ "60-74",
-    agegroup %in% c("75-79", "80-84", "85-Inf") ~ "75+",
-    TRUE ~ agegroup # If any leftover group, keep as is
-  ))
+# Filter for pre-2017 and 2017 data, assign year and week_of_year
+pre_and_during_2017 <- puerto_rico_counts |>
+  filter(date < as.Date("2018-01-01")) |>  # Include all data before 2018
+  mutate(
+    year = year(date),
+    week_of_year = epiweek(date)
+  ) |>
+  group_by(year, week_of_year) |>
+  summarise(
+    total_outcome = sum(outcome, na.rm = TRUE),  # Sum weekly outcomes
+    ndays = n_distinct(date),                   # Ensure full weeks (7 days)
+    .groups = "drop"
+  ) |>
+  filter(ndays == 7) |>  # Keep only full weeks
+  mutate(
+    week_start = as.Date(paste(year, week_of_year, 1, sep = "-"), "%Y-%U-%u")  # Start of each epiweek
+  )
 
-# Aggregate daily data to weekly mortality by combined_agegroup, sex, year, and week_of_year
-weekly_data_combined <- combined_data |>
-  group_by(year, week_of_year, combined_agegroup, sex) |>
-  summarise(weekly_outcome = sum(outcome), .groups = 'drop')
+# Visualization: Weekly total mortality over time
+# Add a new date column to represent the start of each week
+pre_and_during_2017 <- pre_and_during_2017 |>
+  mutate(week_start = as.Date(paste(year, week_of_year, 1, sep = "-"), "%Y-%U-%u"))
 
-# Compute baseline means and sds per week_of_year, agegroup, sex
-baseline_stats_combined <- weekly_data_combined |>
-  group_by(combined_agegroup, sex, week_of_year) |>
+# Visualization: Weekly total mortality over time
+ggplot(pre_and_during_2017, aes(x = week_start, y = total_outcome)) +
+  geom_line() +
+  labs(
+    title = "Weekly Total Mortality (Pre-2017 and 2017)",
+    x = "Week Start Date",
+    y = "Total Weekly Mortality"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1), # Rotate x-axis labels for readability
+    panel.grid.minor = element_blank()
+  )
+```
+
+```{r}
+# Identify weeks with mortality >= 700 for year > 1987 and < 2017
+weeks_high_mortality_post_1987 <- pre_and_during_2017 |>
+  filter(year > 1987 & year <= 2017, total_outcome >= 700) |>
+  select(year, week_of_year, total_outcome, week_start)
+
+# Identify weeks with mortality > 550 for year <= 1987
+weeks_high_mortality_pre_1987 <- pre_and_during_2017 |>
+  filter(year <= 1987, total_outcome > 550) |>
+  select(year, week_of_year, total_outcome, week_start)
+
+# Combine high mortality weeks
+high_mortality_weeks <- bind_rows(
+  weeks_high_mortality_post_1987 |> select(year, week_of_year),
+  weeks_high_mortality_pre_1987 |> select(year, week_of_year)
+)
+
+high_mortality_weeks
+```
+
+```{r}
+#### Remove high mortality weeks from baseline computation
+# Filter pre-2017 data and define epiweek and year
+pre_2017_data <- puerto_rico_counts |>
+  filter(date < as.Date("2017-01-01")) |>
+  mutate(
+    year = year(date),
+    week_of_year = epiweek(date)
+  )
+
+# Aggregate by year, week_of_year, agegroup, and sex, and ensure full weeks (7 distinct days)
+weekly_data <- pre_2017_data |>
+  group_by(year, week_of_year, agegroup, sex) |>
+  summarise(
+    weekly_outcome = sum(outcome, na.rm = TRUE),
+    ndays = n_distinct(date),  # Count distinct days in this week-group
+    .groups = 'drop'
+  ) |>
+  filter(ndays == 7)  # Keep only full weeks
+
+# Remove weeks with high mortality
+filtered_weekly_data <- weekly_data |>
+  anti_join(high_mortality_weeks, by = c("year", "week_of_year"))
+
+# Compute baseline statistics across all pre-2017 years, excluding high mortality weeks
+baseline_stats <- filtered_weekly_data |>
+  group_by(agegroup, sex, week_of_year) |>
   summarise(
     mean_outcome = mean(weekly_outcome, na.rm = TRUE),
     sd_outcome = sd(weekly_outcome, na.rm = TRUE),
     .groups = 'drop'
   )
 
-print("Baseline Weekly Statistics With Combined Age Groups:")
-print(baseline_stats_combined)
-
-# Plot the combined groups
-ggplot(baseline_stats_combined, aes(x = week_of_year, y = mean_outcome, color = sex)) +
-  geom_line() +
-  facet_wrap(~ combined_agegroup, scales = "fixed") +
-  labs(
-    title = "Weekly Expected Mortality (Pre-2017) by Combined Age Groups and Sex",
-    x = "Week of Year",
-    y = "Mean Weekly Mortality"
-  ) +
-  theme_minimal()
+print("Baseline Weekly Statistics (Pre-2017, Excluding High Mortality Weeks):")
+print(baseline_stats)
 ```
 
-# Task 4
 
-```{r}
+
+### Task 4
+
+```{r fig.width=12, fig.height=8}
 maria <- make_date(2017, 9, 20)
 
 q4_data <- puerto_rico_counts |>
@@ -138,7 +225,7 @@ q4_data <- puerto_rico_counts |>
 
 weekly_counts <- q4_data |>
   group_by(date, sex, agegroup) |>
-  summarize(outcome = sum(outcome,na.rm = TRUE), population = mean(population,na.rm = TRUE), n = n(),
+  summarize(outcome = sum(outcome,na.rm = TRUE),n = n(),
             .groups = "drop")|>
   filter(n == 7) |>
   select(-n)|>
@@ -148,46 +235,90 @@ excess_counts <- weekly_counts %>%
   left_join(baseline_stats, by = c('sex', 'agegroup','week_of_year'))|>
   mutate(excess_deaths=outcome-mean_outcome)
 
-
-
-weekly_counts_summary = weekly_counts|>
-  group_by(date) |>
-  summarize(outcome = sum(outcome), 
-            population = sum(population),
-            .groups = "drop") 
-
-
-```
-
-
-
-```{r}
-library(ggplot2)
-
 # Plot the combined groups
 ggplot(excess_counts, aes(x = date, y = excess_deaths, color = sex)) +
   geom_line() +
-  facet_wrap(~ agegroup, scales = "fixed") +
+  facet_wrap(~ agegroup, scales = "free_y") +
   labs(
-    title = "Weekly Expected Mortality (Pre-2017) by Combined Age Groups and Sex",
+    title = "Weekly Excess Mortality  by Combined Age Groups and Sex",
     x = "Week of Year",
-    y = "Mean Weekly Mortality"
+    y = "Weekly Excess Mortality"
   ) +
     theme(
     axis.text.x = element_text(angle = 70, hjust = 1),  # Rotate week labels for better readability
-    strip.text = element_text(size = 10, face = "bold"), # Adjust facet labels
-    legend.position = "none"                            # Remove legend (optional)
+    strip.text = element_text(size = 10, face = "bold") # Adjust facet label                        
   ) 
 
 ```
+Weekly excess deaths were plotted for each age group, separated by sex using facet grids. Axes were scaled independently (free_y) to accommodate varying ranges of mortality across age groups. Weekly excess deaths varied significantly by age group and sex.
+Older age groups (e.g., 85+) exhibited the highest excess mortality (roughly range from -10 to 85), particularly among females.
+Younger age groups (e.g., 0–4) showed minimal to no significant excess deaths. Generally, across most age groups, females experienced slightly higher excess deaths than males, particularly in the elderly cohorts, while mortality in male is more fluctuated than mortality in female. Excess mortality peaked in the weeks immediately following Hurricane María(2017/09/20), with continued elevated mortality into early 2018. Mortality trends normalized for most age groups by mid-2018.
 
 
+### Task 5
+
+```{r}
+# Read and prepare NYTimes data
+ny_times <- read_excel("../data/ny_times_data.xlsx") %>%
+  arrange(Date) %>%
+  mutate(Date = as.Date(Date))  # Ensure Date column is in Date format
+
+# Prepare Puerto Rico daily data
+daily_data <- puerto_rico_counts %>%
+  filter(date >= as.Date("2015-01-01") & date <= as.Date("2017-11-30")) %>%  # Filter date range
+  group_by(date) %>%
+  summarize(Outcome = sum(outcome, na.rm = TRUE), .groups = "drop") %>%
+  rename(Date = date) %>%  # Rename `date` to `Date` for consistency
+  arrange(Date)
+
+# Join datasets and calculate the difference
+compared_data <- ny_times %>%
+  left_join(daily_data, by = "Date") %>%
+  rename(Outcome_NYTimes = Outcome.x, Outcome_DailyData = Outcome.y) %>%
+  mutate(Difference = Outcome_NYTimes - Outcome_DailyData)  # Add Difference column
+```
+
+```{r}
+# Plot the data
+ggplot(compared_data, aes(x = Date)) +
+  geom_line(aes(y = Outcome_NYTimes, color = "NYTimes"), size = 1) +
+  geom_line(aes(y = Outcome_DailyData, color = "DailyData"), size = 1) +
+  labs(
+    title = "Comparison of NYTimes and Daily Data Outcomes",
+    x = "Date",
+    y = "Mortality",
+    color = "Dataset"
+  ) +
+  scale_x_date(
+    breaks = "2 months",             # Add breaks every 2 months
+    date_labels = "%Y-%m-%d",        # Format labels as "Year-Month-Day"
+    expand = c(0, 0)                 # Remove extra space on the x-axis
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels for readability
+    legend.position = "bottom"                          # Move legend to the bottom
+  )
+
+```
+The plot shows the trends of daily mortality counts from both the New York Times and the Puerto Rico daily dataset.
+Overall, the two datasets align closely for most of the time period (2015–2017), but notable divergences occur:
+The NY Times data exhibits a sharp drop toward the end of 2017. The absolute difference plot in Task 5 section of supplementary.qmd highlights the absolute differences in mortality counts between the two datasets. Significant spikes in differences are observed around November 2017, and noticeable spikes occur in August 2015 and 2016.
 
 
+# Discussion (600-700 words)
 
+**Task 2**
 
+The results validate expected mortality patterns, with notable higher rates in males and older demographics. The weekly stability suggests minimal impact from short-term external factors during the analyzed period. Age group combinations were effective in reducing complexity without losing critical insights. This approach is beneficial for similar studies to simplify demographic analysis. 
 
+**Task 4**
 
+The analysis highlights a stark increase in excess deaths across most age groups immediately following Hurricane María, showing Hurricane María caused substantial disruption in Puerto Rico. The prolonged excess mortality among the 85+ group suggests vulnerabilities in healthcare access and other services for the elderly. The observed higher mortality in females for older cohorts may reflect sex-based differences in pre-existing health conditions or access to healthcare services post-hurricane, and minimal excess mortality in younger age groups (e.g., 0–4, 5–9) underscores their resilience of body recovery. It is suggested that policymakers should prioritize infrastructure resilience for the elderly during natural disasters.
+
+**Task 5**
+
+The analysis reveals strong alignment between the New York Times dataset and the Puerto Rico daily mortality data for most of the study period. However, a big discrepancy is observed in November 2017, which may be because death certificates for deaths occurring in November 2017 have been delayed and registered after December 6, 2017, which means they would not be included in the New York Times dataset.The differences in August 2015 and 2016 may be because a specific event (e.g., localized heatwaves) occurred at that point and only one dataset captured it promptly and accurately. These differences underscore the importance of validating data sources and methods when using mortality data for research or decision-making.
 
 
 

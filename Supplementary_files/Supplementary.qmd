@@ -1,6 +1,7 @@
 ---
-title: Supplementary Methods
+title: Excess mortality in Puerto Rico after Hurricane María.
 date: 2024-12-16
+format: pdf
 ---
 
 ## Prepare
@@ -9,6 +10,7 @@ library(excessmort)
 library(dplyr)
 library(lubridate)
 library(ggplot2)
+library(readxl)
 data("puerto_rico_counts") 
 head(puerto_rico_counts)
 ```
@@ -47,7 +49,7 @@ if (nrow(baseline_stats) == 0) {
   stop("No data available for baseline after filtering full weeks.")
 }
 
-cat("Baseline Weekly Statistics (Pre-2017):")
+print("Baseline Weekly Statistics (Pre-2017):")
 print(baseline_stats)
 ```
 
@@ -114,82 +116,50 @@ ggplot(baseline_stats_combined, aes(x = week_of_year, y = mean_outcome, color = 
   ) +
   theme_minimal()
 ```
-## Task 3
+
+## Task 5
 
 ```{r}
-# Filter for pre-2017 and 2017 data, assign year and week_of_year
-pre_and_during_2017 <- puerto_rico_counts |>
-  filter(date < as.Date("2018-01-01")) |>  # Include all data before 2018
-  mutate(
-    year = year(date),
-    week_of_year = epiweek(date)
-  ) |>
-  group_by(year, week_of_year) |>
-  summarise(
-    total_outcome = sum(outcome, na.rm = TRUE),  # Sum weekly outcomes
-    ndays = n_distinct(date),                   # Ensure full weeks (7 days)
-    .groups = "drop"
-  ) |>
-  filter(ndays == 7) |>  # Keep only full weeks
-  mutate(
-    week_start = as.Date(paste(year, week_of_year, 1, sep = "-"), "%Y-%U-%u")  # Start of each epiweek
+
+# Read and prepare NYTimes data
+ny_times <- read_excel("../data/ny_times_data.xlsx") %>%
+  arrange(Date) %>%
+  mutate(Date = as.Date(Date))  # Ensure Date column is in Date format
+
+# Prepare Puerto Rico daily data
+daily_data <- puerto_rico_counts %>%
+  filter(date >= as.Date("2015-01-01") & date <= as.Date("2017-11-30")) %>%  # Filter date range
+  group_by(date) %>%
+  summarize(Outcome = sum(outcome, na.rm = TRUE), .groups = "drop") %>%
+  rename(Date = date) %>%  # Rename `date` to `Date` for consistency
+  arrange(Date)
+
+# Join datasets and calculate the difference
+compared_data <- ny_times %>%
+  left_join(daily_data, by = "Date") %>%
+  rename(Outcome_NYTimes = Outcome.x, Outcome_DailyData = Outcome.y) %>%
+  mutate(Difference = Outcome_NYTimes - Outcome_DailyData)  # Add Difference column
+
+ggplot(compared_data, aes(x = Date)) +
+  # Plot the difference
+  geom_line(aes(y = abs(Difference), color = "Difference"), size = 1) +
+  labs(
+    title = "Absolute Difference Between NYTimes and Daily Data Outcomes Over Time",
+    x = "Date",
+    y = "Absolute_Difference_of_mortality",
+    color = "Legend"
+  ) +
+  scale_x_date(
+    breaks = "2 months",             # Add breaks every 2 months
+    date_labels = "%Y-%m-%d",           # Format labels as "Year-Month"
+    expand = c(0, 0)                 # Remove extra space on the x-axis
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels
+    legend.position = "bottom"                          # Move legend to the bottom
   )
-
-# Visualization: Weekly total mortality over time
-# Add a new date column to represent the start of each week
-pre_and_during_2017 <- pre_and_during_2017 |>
-  mutate(week_start = as.Date(paste(year, week_of_year, 1, sep = "-"), "%Y-%U-%u"))
-
-# Identify weeks with mortality >= 700 for year > 1987 and < 2017
-weeks_high_mortality_post_1987 <- pre_and_during_2017 |>
-  filter(year > 1987 & year <= 2017, total_outcome >= 700) |>
-  select(year, week_of_year, total_outcome, week_start)
-
-# Identify weeks with mortality > 550 for year <= 1987
-weeks_high_mortality_pre_1987 <- pre_and_during_2017 |>
-  filter(year <= 1987, total_outcome > 550) |>
-  select(year, week_of_year, total_outcome, week_start)
-
-# Combine high mortality weeks
-high_mortality_weeks <- bind_rows(
-  weeks_high_mortality_post_1987 |> select(year, week_of_year),
-  weeks_high_mortality_pre_1987 |> select(year, week_of_year)
-)
-
-print(high_mortality_weeks)
-
-#### Remove high mortality weeks from baseline computation
-# Filter pre-2017 data and define epiweek and year
-pre_2017_data <- puerto_rico_counts |>
-  filter(date < as.Date("2017-01-01")) |>
-  mutate(
-    year = year(date),
-    week_of_year = epiweek(date)
-  )
-
-# Aggregate by year, week_of_year, agegroup, and sex, and ensure full weeks (7 distinct days)
-weekly_data <- pre_2017_data |>
-  group_by(year, week_of_year, agegroup, sex) |>
-  summarise(
-    weekly_outcome = sum(outcome, na.rm = TRUE),
-    ndays = n_distinct(date),  # Count distinct days in this week-group
-    .groups = 'drop'
-  ) |>
-  filter(ndays == 7)  # Keep only full weeks
-
-# Remove weeks with high mortality
-filtered_weekly_data <- weekly_data |>
-  anti_join(high_mortality_weeks, by = c("year", "week_of_year"))
-
-# Compute baseline statistics across all pre-2017 years, excluding high mortality weeks
-baseline_stats <- filtered_weekly_data |>
-  group_by(agegroup, sex, week_of_year) |>
-  summarise(
-    mean_outcome = mean(weekly_outcome, na.rm = TRUE),
-    sd_outcome = sd(weekly_outcome, na.rm = TRUE),
-    .groups = 'drop'
-  )
-
-cat("Baseline Weekly Statistics (Pre-2017, Excluding High Mortality Weeks):")
-baseline_stats
 ```
+
+
+
