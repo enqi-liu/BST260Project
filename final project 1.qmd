@@ -164,19 +164,20 @@ weekly_counts_summary = weekly_counts|>
 ```{r}
 library(ggplot2)
 
-# Create the plot with facet grid
-ggplot(excess_counts, aes(x = agegroup, y = excess_deaths)) +
-  geom_bar(stat = "identity", fill = "skyblue") +
-  facet_grid(~sex) + # Create separate panels for male and female
+# Plot the combined groups
+ggplot(excess_counts, aes(x = date, y = excess_deaths, color = sex)) +
+  geom_line() +
+  facet_wrap(~ agegroup, scales = "fixed") +
   labs(
-    title = "Excess Deaths by Age Group and Sex (2017–2018)",
-    x = "Age Group",
-    y = "Total Excess Deaths"
+    title = "Weekly Expected Mortality (Pre-2017) by Combined Age Groups and Sex",
+    x = "Week of Year",
+    y = "Mean Weekly Mortality"
   ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1) # Rotate x-axis labels for better readability
-  )
+    theme(
+    axis.text.x = element_text(angle = 70, hjust = 1),  # Rotate week labels for better readability
+    strip.text = element_text(size = 10, face = "bold"), # Adjust facet labels
+    legend.position = "none"                            # Remove legend (optional)
+  ) 
 
 ```
 
