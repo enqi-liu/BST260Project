@@ -26,11 +26,11 @@ The specific objectives of this study are the quantification of excess mortality
 
 To examine the demographic counts, broken down by age group and sex, the dataset puerto_rico_counts from the R package excessmort was utilized. First, the dataset was grouped by age group and sex to calculate the average population of each pairing of individuals. This was done using the group_by() and summarise() functions in R, with proper handling of missing values, including na.rm = TRUE in the aggregation. The findings were further illustrated using a bar plot created with the ggplot2 package, where the bars for males and females are separated and grouped by each age category. A "dodge" position adjustment is performed in order to make the comparison between gender in the same age group clearer. Such visualization was useful in demographic studies and presents the differences between population proportions in relation to different age groups and sexes.All this has enabled detailed study of population dynamics, laying the ground for basic understanding of demographic distributions necessary for further mortality analyses. 
 
-**Task2:**
+**Task 2**
 
 We used historical mortality data from Puerto Rico collected before 2017 to estimate weekly expected mortality and standard deviation by age group and sex. The dataset included daily mortality counts, which we filtered for pre-2017 dates. Using the R package, we added variables for the year and ISO week to ensure standard week alignment. We calculated weekly mortality by aggregating daily counts per age group, sex, and week. Baseline statistics, including mean and standard deviation, were computed for each group. For streamlined analysis, age groups were combined based on mortality rate similarities into categories: 0-14, 15-39, 40-59, 60-74, and 75+. Visualization of these patterns was achieved using ggplot2, showing trends in mean weekly mortality by age and sex.
 
-**Task3:**
+**Task 3**
 
 To explore excess mortality periods in Puerto Rico before 2018 (during or before 2017), we analyzed weekly mortality counts, ensuring inclusion of only complete weeks (seven days). We visualized the data to identify spikes, using thresholds to define excess mortality—700 deaths per week post-1987 and 550 pre-1987—based on historical trends. This baseline allowed us to flag weeks with significantly higher mortality. We then removed these high mortality weeks from the dataset to recalculate expected death rates. This ensured that baseline statistics, such as mean and standard deviation, accurately reflected normal patterns without influence from exceptional events. 
 
@@ -44,6 +44,9 @@ The New York Times data was extracted via pdfplumber in Python (ipynb file is pr
 
 The Puerto Rico dataset in excessmort package was grouped by date, and the two datasets were merged using a left join on the Date column.  Absolute values of difference between Outcome_NYTimes (from the NY Times dataset) and Outcome_DailyData (from the Puerto Rico dataset) were also calculated and plotted.
 
+**Integration of Methods**
+
+Such demographic analysis, historical baselines, anomaly detection, and external validation made the research strong. Each of the tasks was designed to take care of a particular aspect of the research objectives; this was done with extreme caution regarding data quality and statistical reliability. R provided the flexibility in handling big data, enhancing reproducibility and scalability. Taken together, these methods outline a framework suitable for use in future studies focused on mortality trends in disaster-affected regions.
 
 # 4 Results (500-600 words)
 
@@ -73,11 +76,12 @@ ggplot(population_summary, aes(x = agegroup, y = mean_population, fill = sex)) +
        x = "Age Group", y = "Average Population Size") +
   theme_minimal()
 ```
-In the younger age group, under 14 years, male has higher proportion than female. This might be because of the notion that some of the family willingly prefer having boy baby than  girl. Besides, the sex ratio at born is around 105-107 boys versus 100 girls globally.
 
-In the working age group, 20-49, female has higher proportion than male. This might be because male moving out for work or moving out for immigration.
+In the youngest age group, 0–14 years, males consistently outnumber females, consistent with the global biological norm, in which the sex ratio at birth is roughly 105–107 males per 100 females. 
 
-During the elder group, the proportion of female is still higher than that of male. This might be because the average age of female is higher than that of male. 
+In the working-age group, 20–49 years, females are more in proportion compared to males. This may be due to the fact that males migrate for job opportunities or other socio-economic reasons, which in turn decreases the male population locally. Such migration not only alters demographic proportions but may also affect the distribution of health risks and access to resources in this age group.
+
+The percentage distribution across sex is noticeably high in females compared to males, which is not unexpected among those aged 65+, a common characteristic seen around the world because of higher female life expectancy. The demography reflects, especially, the higher vulnerability in older women due to several issues in health and resources that may further exacerbate their condition following disasters. These observations again underline the importance of interventions appropriate to each demographic category. 
 
 
 ### Task 2
