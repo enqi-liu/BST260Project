@@ -23,8 +23,9 @@ The specific objectives of this study are the quantification of excess mortality
 # 3 Methods (600-700 words)
 
 **Task 1**
+To examine the demographic counts, broken down by age group and sex, the dataset puerto_rico_counts from the R package excessmort was utilized. The dataset was grouped by age group and sex to calculate the average population for each combination of these variables. This was achieved using the group_by() and summarise() functions in R, with appropriate handling of missing values by including na.rm = TRUE in the aggregation.
 
-To examine the demographic counts, broken down by age group and sex, the dataset puerto_rico_counts from the R package excessmort was utilized. First, the dataset was grouped by age group and sex to calculate the average population of each pairing of individuals. This was done using the group_by() and summarise() functions in R, with proper handling of missing values, including na.rm = TRUE in the aggregation. The findings were further illustrated using a bar plot created with the ggplot2 package, where the bars for males and females are separated and grouped by each age category. A "dodge" position adjustment is performed in order to make the comparison between gender in the same age group clearer. Such visualization was useful in demographic studies and presents the differences between population proportions in relation to different age groups and sexes.All this has enabled detailed study of population dynamics, laying the ground for basic understanding of demographic distributions necessary for further mortality analyses. 
+The results were visualized using a line plot created with the ggplot2 package, where distinct lines represent males and females, grouped by sex and differentiated by color. This approach ensures clear visualization of trends across age groups, with lines making it easier to observe continuous changes in population proportions. The inclusion of points along the lines highlights specific data values, enhancing interpretability. Such visualization is particularly valuable in demographic studies, as it allows for a more nuanced understanding of differences in population proportions across sexes and age groups. 
 
 **Task 2**
 
@@ -70,11 +71,13 @@ population_summary <- puerto_rico_counts |>
 
 print(population_summary)
 
-ggplot(population_summary, aes(x = agegroup, y = mean_population, fill = sex)) +
-  geom_bar(stat = "identity", position = "dodge") +
+ggplot(population_summary, aes(x = agegroup, y = mean_population, color = sex, group = sex)) +
+  geom_line(size = 1) + # Add lines
+  geom_point(size = 2) + # Add points for better visualization
   labs(title = "Average Population Size by Age Group and Sex",
        x = "Age Group", y = "Average Population Size") +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 ```
 
 In the youngest age group, 0–14 years, males consistently outnumber females, consistent with the global biological norm, in which the sex ratio at birth is roughly 105–107 males per 100 females. 

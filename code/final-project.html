@@ -116,8 +116,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="methods-600-700-words" class="level1">
 <h1>3 Methods (600-700 words)</h1>
-<p><strong>Task 1</strong></p>
-<p>To examine the demographic counts, broken down by age group and sex, the dataset puerto_rico_counts from the R package excessmort was utilized. First, the dataset was grouped by age group and sex to calculate the average population of each pairing of individuals. This was done using the group_by() and summarise() functions in R, with proper handling of missing values, including na.rm = TRUE in the aggregation. The findings were further illustrated using a bar plot created with the ggplot2 package, where the bars for males and females are separated and grouped by each age category. A “dodge” position adjustment is performed in order to make the comparison between gender in the same age group clearer. Such visualization was useful in demographic studies and presents the differences between population proportions in relation to different age groups and sexes.All this has enabled detailed study of population dynamics, laying the ground for basic understanding of demographic distributions necessary for further mortality analyses.</p>
+<p><strong>Task 1</strong> To examine the demographic counts, broken down by age group and sex, the dataset puerto_rico_counts from the R package excessmort was utilized. The dataset was grouped by age group and sex to calculate the average population for each combination of these variables. This was achieved using the group_by() and summarise() functions in R, with appropriate handling of missing values by including na.rm = TRUE in the aggregation.</p>
+<p>The results were visualized using a line plot created with the ggplot2 package, where distinct lines represent males and females, grouped by sex and differentiated by color. This approach ensures clear visualization of trends across age groups, with lines making it easier to observe continuous changes in population proportions. The inclusion of points along the lines highlights specific data values, enhancing interpretability. Such visualization is particularly valuable in demographic studies, as it allows for a more nuanced understanding of differences in population proportions across sexes and age groups.</p>
 <p><strong>Task 2</strong></p>
 <p>We used historical mortality data from Puerto Rico collected before 2017 to estimate weekly expected mortality and standard deviation by age group and sex. The dataset included daily mortality counts, which we filtered for pre-2017 dates. Using the R package, we added variables for the year and ISO week to ensure standard week alignment. We calculated weekly mortality by aggregating daily counts per age group, sex, and week. Baseline statistics, including mean and standard deviation, were computed for each group. For streamlined analysis, age groups were combined based on mortality rate similarities into categories: 0-14, 15-39, 40-59, 60-74, and 75+. Visualization of these patterns was achieved using ggplot2, showing trends in mean weekly mortality by age and sex.</p>
 <p><strong>Task 3</strong></p>
@@ -181,11 +181,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 10 20-24    male           135803.
 # ℹ 26 more rows</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(population_summary, <span class="fu">aes</span>(<span class="at">x =</span> agegroup, <span class="at">y =</span> mean_population, <span class="at">fill =</span> sex)) <span class="sc">+</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average Population Size by Age Group and Sex"</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Age Group"</span>, <span class="at">y =</span> <span class="st">"Average Population Size"</span>) <span class="sc">+</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(population_summary, <span class="fu">aes</span>(<span class="at">x =</span> agegroup, <span class="at">y =</span> mean_population, <span class="at">color =</span> sex, <span class="at">group =</span> sex)) <span class="sc">+</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span> <span class="co"># Add lines</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span> <span class="co"># Add points for better visualization</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average Population Size by Age Group and Sex"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Age Group"</span>, <span class="at">y =</span> <span class="st">"Average Population Size"</span>) <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
 <div class="cell-output-display">
 <p><img src="final-project_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -197,43 +203,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="task-2" class="level3">
 <h3 class="anchored" data-anchor-id="task-2">Task 2</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pre_2017_data <span class="ot">&lt;-</span> puerto_rico_counts <span class="sc">|&gt;</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">&lt;</span> <span class="fu">as.Date</span>(<span class="st">"2017-01-01"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">year</span>(date),</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">week_of_year =</span> <span class="fu">epiweek</span>(date)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate by year, week_of_year, agegroup, and sex, and ensure full weeks (7 distinct days)</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>weekly_data <span class="ot">&lt;-</span> pre_2017_data <span class="sc">|&gt;</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, week_of_year, agegroup, sex) <span class="sc">|&gt;</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">weekly_outcome =</span> <span class="fu">sum</span>(outcome, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">ndays =</span> <span class="fu">n_distinct</span>(date),  <span class="co"># Count distinct days in this week-group</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">'drop'</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ndays <span class="sc">==</span> <span class="dv">7</span>)  <span class="co"># Keep only full weeks</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute baseline statistics across all pre-2017 years</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>baseline_stats <span class="ot">&lt;-</span> weekly_data <span class="sc">|&gt;</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(agegroup, sex, week_of_year) <span class="sc">|&gt;</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_outcome =</span> <span class="fu">mean</span>(weekly_outcome, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_outcome =</span> <span class="fu">sd</span>(weekly_outcome, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">'drop'</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot: Facet by age group, color by sex on the same plot</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(baseline_stats, <span class="fu">aes</span>(<span class="at">x =</span> week_of_year, <span class="at">y =</span> mean_outcome, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> agegroup, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Weekly Expected Mortality (Pre-2017) by Age Group and Sex"</span>,</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Week of Year"</span>,</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Mean Weekly Mortality"</span>,</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Sex"</span></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pre_2017_data <span class="ot">&lt;-</span> puerto_rico_counts <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">&lt;</span> <span class="fu">as.Date</span>(<span class="st">"2017-01-01"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">year</span>(date),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">week_of_year =</span> <span class="fu">epiweek</span>(date)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate by year, week_of_year, agegroup, and sex, and ensure full weeks (7 distinct days)</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>weekly_data <span class="ot">&lt;-</span> pre_2017_data <span class="sc">|&gt;</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, week_of_year, agegroup, sex) <span class="sc">|&gt;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">weekly_outcome =</span> <span class="fu">sum</span>(outcome, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">ndays =</span> <span class="fu">n_distinct</span>(date),  <span class="co"># Count distinct days in this week-group</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">'drop'</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ndays <span class="sc">==</span> <span class="dv">7</span>)  <span class="co"># Keep only full weeks</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute baseline statistics across all pre-2017 years</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>baseline_stats <span class="ot">&lt;-</span> weekly_data <span class="sc">|&gt;</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(agegroup, sex, week_of_year) <span class="sc">|&gt;</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_outcome =</span> <span class="fu">mean</span>(weekly_outcome, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_outcome =</span> <span class="fu">sd</span>(weekly_outcome, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">'drop'</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot: Facet by age group, color by sex on the same plot</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(baseline_stats, <span class="fu">aes</span>(<span class="at">x =</span> week_of_year, <span class="at">y =</span> mean_outcome, <span class="at">color =</span> sex)) <span class="sc">+</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> agegroup, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Weekly Expected Mortality (Pre-2017) by Age Group and Sex"</span>,</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Week of Year"</span>,</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Mean Weekly Mortality"</span>,</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Sex"</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="final-project_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="1152"></p>
 </div>
@@ -243,51 +249,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="task-3" class="level3">
 <h3 class="anchored" data-anchor-id="task-3">Task 3</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for pre-2017 and 2017 data, assign year and week_of_year</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pre_and_during_2017 <span class="ot">&lt;-</span> puerto_rico_counts <span class="sc">|&gt;</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">&lt;</span> <span class="fu">as.Date</span>(<span class="st">"2018-01-01"</span>)) <span class="sc">|&gt;</span>  <span class="co"># Include all data before 2018</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">year</span>(date),</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">week_of_year =</span> <span class="fu">epiweek</span>(date)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, week_of_year) <span class="sc">|&gt;</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_outcome =</span> <span class="fu">sum</span>(outcome, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),  <span class="co"># Sum weekly outcomes</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">ndays =</span> <span class="fu">n_distinct</span>(date),                   <span class="co"># Ensure full weeks (7 days)</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ndays <span class="sc">==</span> <span class="dv">7</span>) <span class="sc">|&gt;</span>  <span class="co"># Keep only full weeks</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">week_start =</span> <span class="fu">as.Date</span>(<span class="fu">paste</span>(year, week_of_year, <span class="dv">1</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="st">"%Y-%U-%u"</span>)  <span class="co"># Start of each epiweek</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization: Weekly total mortality over time</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a new date column to represent the start of each week</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>pre_and_during_2017 <span class="ot">&lt;-</span> pre_and_during_2017 <span class="sc">|&gt;</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week_start =</span> <span class="fu">as.Date</span>(<span class="fu">paste</span>(year, week_of_year, <span class="dv">1</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="st">"%Y-%U-%u"</span>))</span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pre_and_during_2017, <span class="fu">aes</span>(<span class="at">x =</span> week_start, <span class="at">y =</span> total_outcome)) <span class="sc">+</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"#2C3E50"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span>  </span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"#E74C3C"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">size =</span> <span class="fl">0.8</span>) <span class="sc">+</span>  </span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Weekly Total Mortality (Pre-2017 and 2017)"</span>,</span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Week Start Date"</span>,</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Total Weekly Mortality"</span></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">date_labels =</span> <span class="st">"%Y"</span>, <span class="at">date_breaks =</span> <span class="st">"12 months"</span>) <span class="sc">+</span>  </span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span>  </span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>),  </span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">face =</span> <span class="st">"italic"</span>),</span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">1</span>), </span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>)), </span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),  </span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"#ECF0F1"</span>) </span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-ℹ Please use `linewidth` instead.</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter for pre-2017 and 2017 data, assign year and week_of_year</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>pre_and_during_2017 <span class="ot">&lt;-</span> puerto_rico_counts <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">&lt;</span> <span class="fu">as.Date</span>(<span class="st">"2018-01-01"</span>)) <span class="sc">|&gt;</span>  <span class="co"># Include all data before 2018</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">year</span>(date),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">week_of_year =</span> <span class="fu">epiweek</span>(date)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, week_of_year) <span class="sc">|&gt;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_outcome =</span> <span class="fu">sum</span>(outcome, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),  <span class="co"># Sum weekly outcomes</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">ndays =</span> <span class="fu">n_distinct</span>(date),                   <span class="co"># Ensure full weeks (7 days)</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ndays <span class="sc">==</span> <span class="dv">7</span>) <span class="sc">|&gt;</span>  <span class="co"># Keep only full weeks</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">week_start =</span> <span class="fu">as.Date</span>(<span class="fu">paste</span>(year, week_of_year, <span class="dv">1</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="st">"%Y-%U-%u"</span>)  <span class="co"># Start of each epiweek</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualization: Weekly total mortality over time</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a new date column to represent the start of each week</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>pre_and_during_2017 <span class="ot">&lt;-</span> pre_and_during_2017 <span class="sc">|&gt;</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week_start =</span> <span class="fu">as.Date</span>(<span class="fu">paste</span>(year, week_of_year, <span class="dv">1</span>, <span class="at">sep =</span> <span class="st">"-"</span>), <span class="st">"%Y-%U-%u"</span>))</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pre_and_during_2017, <span class="fu">aes</span>(<span class="at">x =</span> week_start, <span class="at">y =</span> total_outcome)) <span class="sc">+</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"#2C3E50"</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span>  </span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"#E74C3C"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">size =</span> <span class="fl">0.8</span>) <span class="sc">+</span>  </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Weekly Total Mortality (Pre-2017 and 2017)"</span>,</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Week Start Date"</span>,</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Total Weekly Mortality"</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(<span class="at">date_labels =</span> <span class="st">"%Y"</span>, <span class="at">date_breaks =</span> <span class="st">"12 months"</span>) <span class="sc">+</span>  </span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span>  </span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>),  </span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">face =</span> <span class="st">"italic"</span>),</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">1</span>), </span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>)), </span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),  </span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"#ECF0F1"</span>) </span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'</code></pre>
 </div>
